@@ -27,10 +27,20 @@ def generate():
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
-        # Use the correct method for generating text
-        response = model.generate_text(prompt)
+        # Log the prompt to ensure it's correctly received
+        print(f"Received prompt: {prompt}")
+
+        # Use the appropriate API method for text generation (based on available methods)
+        response = model.complete(prompt)  # Adjusted method to 'complete', as 'generate' is not valid.
+
+        # Log the response to see what we get from the API
+        print(f"Response from Gemini API: {response}")
+
         return jsonify({"response": response.text})
+    
     except Exception as e:
+        # Log the exception for debugging
+        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
