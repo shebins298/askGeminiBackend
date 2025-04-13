@@ -1,18 +1,25 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS
+CORS(app, origins="*")  # Allow all origins (or specify only GitHub Pages URL)
 
-# Set your Gemini API key (from Render's environment variables)
+# Gemini API setup
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
-@app.route("/generate", methods=["POST"])
+@app.route("/", methods=["GET"])
+def home():
+    return "✅ Gemini backend is live!", 200
+
+@app.route("/generate", methods=["POST", "OPTIONS"])
 def generate():
+    if request.method == "OPTIONS":
+        # Preflight request — just return ok
+        return '', 200
+
     data = request.get_json()
     prompt = data.get("prompt")
 
@@ -26,6 +33,7 @@ def generate():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=10000, debug=True)
+
+
     
