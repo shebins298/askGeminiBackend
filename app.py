@@ -4,25 +4,22 @@ import os
 import google.generativeai as genai
 
 app = Flask(__name__)
+CORS(app, origins="*")  # Allow all origins (or specify only GitHub Pages URL)
 
-# Enable CORS for all origins (can replace "*" with specific origins like your GitHub Pages URL)
-CORS(app, origins="*")
-
-# Configure Gemini API using your API key from environment variables
+# Gemini API setup
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")  # Specify the Gemini 1.5 Flash model
+model = genai.GenerativeModel("gemini-1.5")  # Ensure the model is correctly named for 1.5
 
 @app.route("/", methods=["GET"])
 def home():
-    return "✅ Gemini 1.5 Flash backend is live!", 200
+    return "✅ Gemini backend is live!", 200
 
 @app.route("/generate", methods=["POST", "OPTIONS"])
 def generate():
     if request.method == "OPTIONS":
-        # Handle CORS preflight request
+        # Preflight request — just return ok
         return '', 200
 
-    # Handle POST request to generate content
     data = request.get_json()
     prompt = data.get("prompt")
 
@@ -30,8 +27,8 @@ def generate():
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
-        # Use Gemini 1.5 Flash to generate content
-        response = model.generate(prompt)
+        # Use the correct method for generating text
+        response = model.generate_text(prompt)
         return jsonify({"response": response.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
