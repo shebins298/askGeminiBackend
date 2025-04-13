@@ -2,14 +2,17 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import google.generativeai as genai
-import traceback
 
 app = Flask(__name__)
-CORS(app, origins="*")  # Allow all origins (or specify only GitHub Pages URL)
+CORS(app, origins="*")  # Allow all origins (or set specific domains)
 
-# Gemini API setup
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-2")  # Ensure the model is correctly named for 2.0
+# Configure Gemini API
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("GEMINI_API_KEY environment variable not set!")
+
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-1.5-pro")  # You can change to "gemini-2" if available
 
 @app.route("/", methods=["GET"])
 def home():
@@ -18,7 +21,7 @@ def home():
 @app.route("/generate", methods=["POST", "OPTIONS"])
 def generate():
     if request.method == "OPTIONS":
-        return '', 200
+        return '', 200  # Preflight CORS check
 
     data = request.get_json()
     prompt = data.get("prompt")
@@ -27,19 +30,15 @@ def generate():
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
-        print(f"Received prompt: {prompt}")
-        # TEMP: Just return dummy data to verify front-end works
-        return jsonify({"response": f"You said: {prompt}"})
-    
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        print(f"📥 Prompt received: {prompt}")
+        chat = model.start_chat()
+        response = chat.send_message(prompt)
+        print(f"📤 Gemini Response: {response.text}")
+        return jsonify({"response": response.text})
 
     except Exception as e:
-        # Log the full traceback for detailed error info
-        print(f"Error: {str(e)}")
-        print("Stack trace:", traceback.format_exc())  # This will show the full error stack trace
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        print(f"❌ Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)
