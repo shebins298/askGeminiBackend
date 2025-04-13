@@ -18,7 +18,6 @@ def home():
 @app.route("/generate", methods=["POST", "OPTIONS"])
 def generate():
     if request.method == "OPTIONS":
-        # Preflight request — just return ok
         return '', 200
 
     data = request.get_json()
@@ -28,17 +27,13 @@ def generate():
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
-        # Log the received data for debugging
-        print(f"Received data: {data}")
         print(f"Received prompt: {prompt}")
-
-        # Use the appropriate API method for text generation (based on available methods)
-        response = model.complete(prompt)  # Adjusted method to 'complete', as 'generate' is not valid.
-
-        # Log the response to see what we get from the API
-        print(f"Response from Gemini API: {response}")
-
-        return jsonify({"response": response.text})
+        # TEMP: Just return dummy data to verify front-end works
+        return jsonify({"response": f"You said: {prompt}"})
+    
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
     except Exception as e:
         # Log the full traceback for detailed error info
