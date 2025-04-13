@@ -6,13 +6,13 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app, origins="*")  # Allow all origins (or specify only GitHub Pages URL)
 
-# Gemini API setup
+# Gemini 2 API setup
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5")  # Ensure the model is correctly named for 1.5
+model = genai.GenerativeModel("gemini-2")  # Specify Gemini 2 model name
 
 @app.route("/", methods=["GET"])
 def home():
-    return "✅ Gemini backend is live!", 200
+    return "✅ Gemini 2 backend is live!", 200
 
 @app.route("/generate", methods=["POST", "OPTIONS"])
 def generate():
@@ -31,7 +31,7 @@ def generate():
         print(f"Received prompt: {prompt}")
 
         # Use the appropriate API method for text generation (based on available methods)
-        response = model.complete(prompt)  # Adjusted method to 'complete', as 'generate' is not valid.
+        response = model.complete(prompt)  # Adjusted method to 'complete', as 'generate' might not exist in Gemini 2
 
         # Log the response to see what we get from the API
         print(f"Response from Gemini API: {response}")
