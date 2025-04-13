@@ -4,7 +4,7 @@ import os
 import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app, origins="*")  # Allow all origins (or set specific domains)
+CORS(app, origins=["https://shebins298.github.io"])
 
 # Configure Gemini API
 api_key = os.environ.get("GEMINI_API_KEY")
