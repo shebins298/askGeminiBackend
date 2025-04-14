@@ -12,7 +12,7 @@ if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable not set!")
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-pro")  # You can change to "gemini-2" if available
+model = genai.GenerativeModel("gemini-1.5-flash")  # You can change to "gemini-2" if available
 
 @app.route("/", methods=["GET"])
 def home():
